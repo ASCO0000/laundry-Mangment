@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Wave Laundry - Admin Control Center</title>
+    <style>
+        :root {
+            --navy-dark: #1B2A4A;
+            --navy-hover: #24375E;
+            --blue-primary: #2563EB;
+            --blue-light: #3B82F6;
+            --bg-body: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --border: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --badge-active: #DCFCE7;
+            --badge-active-txt: #166534;
+            --badge-inactive: #F1F5F9;
+            --badge-inactive-txt: #64748B;
+        }
+
+        [data-theme="dark"] {
+            --navy-dark: #0F172A;
+            --navy-hover: #1E293B;
+            --bg-body: #090D16;
+            --card-bg: #1E293B;
+            --border: #334155;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --badge-active: #064E3B;
+            --badge-active-txt: #A7F3D0;
+            --badge-inactive: #334155;
+            --badge-inactive-txt: #CBD5E1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: var(--navy-dark);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            min-height: 100vh;
+            position: sticky;
+            top: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 50;
+            transition: width 0.3s;
+        }
+
+        .brand-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .brand-logo {
+            font-size: 28px;
+        }
+
+        .brand-info h1 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .brand-info p {
+            font-size: 11px;
+            color: #94A3B8;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 14px 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            color: #CBD5E1;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: var(--navy-hover);
+            color: white;
+        }
+
+        .nav-item.active {
+            background-color: var(--blue-primary);
+            color: white;
+        }
+
+        .nav-item .icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 13px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--blue-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-signout {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #F87171;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-signout:hover {
+            background: #EF4444;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .top-navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+
+        .top-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .top-title p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--blue-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--blue-light);
+        }
+
+        .btn-outline {
+            background-color: var(--card-bg);
+            border-color: var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--border);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* Page Content Area */
+        .content-area {
+            padding: 24px 28px;
+            flex: 1;
+        }
+
+        .module-page {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .module-page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .kpi-info h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .kpi-icon {
+            font-size: 24px;
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(37, 99, 235, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Panel Card */
+        .panel-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .panel-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 6px 12px;
+            gap: 8px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            outline: none;
+            font-size: 13px;
+            width: 200px;
+        }
+
+        .select-filter {
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: var(--bg-body);
+            color: var(--text-muted);
+            font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background-color: rgba(37, 99, 235, 0.02);
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-active {
+            background-color: var(--badge-active);
+            color: var(--badge-active-txt);
+        }
+
+        .badge-inactive {
+            background-color: var(--badge-inactive);
+            color: var(--badge-inactive-txt);
+        }
+
+        .badge-blue {
+            background-color: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-amber {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-purple {
+            background-color: #F3E8FF;
+            color: #6B21A8;
+        }
+
+        .badge-red {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* Table Action Buttons */
+        .btn-table {
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            padding: 5px 9px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+
+        .btn-table:hover {
+            background: var(--border);
+        }
+
+        .btn-table.danger {
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-table.danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: #FEF2F2;
+            border: 1px solid #FCA5A5;
+            color: #991B1B;
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            max-width: 580px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: modalPop 0.2s ease;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            outline: none;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            border-color: var(--blue-primary);
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Printable Receipt View */
+        @media print {
+            .sidebar, .top-navbar, .toolbar, .btn-action, .btn-table, .modal-close {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .panel-card, .modal-card {
+                box-shadow: none !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+        <div class="brand-header">
+            <span class="brand-logo">🧺</span>
+            <div class="brand-info">
+                <h1>Blue Wave Laundry</h1>
+                <p>Admin Management System</p>
+            </div>
+        </div>
+
+        <ul class="nav-list">
+            <li><a class="nav-item active" onclick="showModule('dashboard', this)"><span class="icon">📊</span> <span>Dashboard</span></a></li>
+            <li><a class="nav-item" onclick="showModule('customers', this)"><span class="icon">👥</span> <span>Customers</span></a></li>
+            <li><a class="nav-item" onclick="showModule('services', this)"><span class="icon">🏷️</span> <span>Laundry Services</span></a></li>
+            <li><a class="nav-item" onclick="showModule('orders', this)"><span class="icon">📦</span> <span>Order Management</span></a></li>
+            <li><a class="nav-item" onclick="showModule('statusTracking', this)"><span class="icon">🔄</span> <span>Status Tracking</span></a></li>
+            <li><a class="nav-item" onclick="showModule('billing', this)"><span class="icon">💳</span> <span>Billing & Payments</span></a></li>
+            <li><a class="nav-item" onclick="showModule('deliveries', this)"><span class="icon">🚚</span> <span>Pickup & Delivery</span></a></li>
+            <li><a class="nav-item" onclick="showModule('reports', this)"><span class="icon">📈</span> <span>Reports & Analytics</span></a></li>
+            <li><a class="nav-item" onclick="showModule('disputes', this)"><span class="icon">🚨</span> <span>Disputes & Claims</span> <span class="badge badge-danger" id="sidebarDisputeCount" style="margin-left:auto; display:none; padding:2px 8px; font-size:11px;">0</span></a></li>
+            <li style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+                <a href="/" target="_blank" class="nav-item"><span class="icon">🌐</span> <span>Open Customer App</span></a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div style="font-weight: bold;" id="userName">System Administrator</div>
+                    <div style="font-size: 11px; color: #94A3B8;" id="userRole">ROLE: ADMIN</div>
+                </div>
+            </div>
+            <button class="btn-signout" onclick="logout()">
+                <span>🚪</span> Sign Out
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="top-title">
+                <h2 id="pageTitle">📊 Dashboard Overview</h2>
+                <p id="pageSubtitle">Real-time laundry operations, KPIs, and financials</p>
+            </div>
+            <div class="top-actions">
+                <button class="btn-action btn-outline" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span> <span id="themeText">Dark Mode</span>
+                </button>
+                <a href="/" target="_blank" class="btn-action btn-outline">
+                    <span>🌐 Customer App</span>
+                </a>
+                <button class="btn-action btn-primary" onclick="openCreateOrderModal()">
+                    <span>➕ New Order</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="content-area">
+
+            <!-- MODULE 1: DASHBOARD -->
+            <section id="module-dashboard" class="module-page active">
+                <div class="cards-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>TOTAL ORDERS</h4>
+                            <div class="kpi-value" id="kpiTotalOrders">0</div>
+                        </div>
+                        <div class="kpi-icon">📦</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>PENDING WASH / PROCESS</h4>
+                            <div class="kpi-value" id="kpiPendingOrders" style="color: var(--warning);">0</div>
+                        </div>
+                        <div class="kpi-icon">⏳</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>COMPLETED DELIVERIES</h4>
+                            <div class="kpi-value" id="kpiCompletedOrders" style="color: var(--success);">0</div>
+                        </div>
+                        <div class="kpi-icon">🚚</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>TOTAL CUSTOMERS</h4>
+                            <div class="kpi-value" id="kpiTotalCustomers">0</div>
+                        </div>
+                        <div class="kpi-icon">👥</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>ACTIVE SERVICES</h4>
+                            <div class="kpi-value" id="kpiActiveServices">8</div>
+                        </div>
+                        <div class="kpi-icon">🏷️</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>TODAY'S REVENUE</h4>
+                            <div class="kpi-value" id="kpiTodayRevenue" style="color: var(--blue-primary);">₹0.00</div>
+                        </div>
+                        <div class="kpi-icon">💰</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>TOTAL COLLECTED</h4>
+                            <div class="kpi-value" id="kpiTotalRevenue" style="color: var(--success);">₹0.00</div>
+                        </div>
+                        <div class="kpi-icon">💵</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>OUTSTANDING BALANCE</h4>
+                            <div class="kpi-value" id="kpiOutstanding" style="color: var(--danger);">₹0.00</div>
+                        </div>
+                        <div class="kpi-icon">⚠️</div>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>📦</span> Recent Laundry Orders</h3>
+                        <div class="toolbar">
+                            <button class="btn-action btn-outline" onclick="loadDashboard()"><span>🔄</span> Refresh</button>
+                            <button class="btn-action btn-primary" onclick="showModule('orders')"><span>📋</span> View All Orders</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="recentOrdersTable">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Date</th>
+                                    <th>Delivery Date</th>
+                                    <th>Amount (₹)</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Loading recent orders...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 2: CUSTOMERS -->
+            <section id="module-customers" class="module-page">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>👥</span> Registered Customers</h3>
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <span>🔍</span>
+                                <input type="text" id="custSearchInput" placeholder="Search by name, phone..." oninput="debounce(loadCustomers, 300)()">
+                            </div>
+                            <button class="btn-action btn-outline" onclick="loadCustomers()"><span>🔄</span> Refresh</button>
+                            <button class="btn-action btn-primary" onclick="openAddCustomerModal()"><span>➕</span> Add Customer</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="customersTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Full Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Email Address</th>
+                                    <th>Pickup / Delivery Address</th>
+                                    <th>Date Registered</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 3: LAUNDRY SERVICES -->
+            <section id="module-services" class="module-page">
+                <div class="cards-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>TOTAL SERVICES</h4>
+                            <div class="kpi-value" id="srvTotal">8</div>
+                        </div>
+                        <div class="kpi-icon">🏷️</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>ACTIVE SERVICES</h4>
+                            <div class="kpi-value" id="srvActive" style="color: var(--success);">8</div>
+                        </div>
+                        <div class="kpi-icon">✅</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>INACTIVE SERVICES</h4>
+                            <div class="kpi-value" id="srvInactive" style="color: var(--text-muted);">0</div>
+                        </div>
+                        <div class="kpi-icon">⏸️</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-info">
+                            <h4>AVERAGE PRICE</h4>
+                            <div class="kpi-value" id="srvAvgPrice" style="color: var(--blue-primary);">₹0.00</div>
+                        </div>
+                        <div class="kpi-icon">💰</div>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>🏷️</span> Laundry Services & Pricing (INR ₹)</h3>
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <span>🔍</span>
+                                <input type="text" id="srvSearchInput" placeholder="Search service name..." oninput="debounce(loadServices, 300)()">
+                            </div>
+                            <button class="btn-action btn-outline" onclick="loadServices()"><span>🔄</span> Refresh</button>
+                            <button class="btn-action btn-primary" onclick="openAddServiceModal()"><span>➕</span> Add Service</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="servicesTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Service Name</th>
+                                    <th>Description</th>
+                                    <th>Pricing Unit</th>
+                                    <th>Price (₹)</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 4: ORDER MANAGEMENT -->
+            <section id="module-orders" class="module-page">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>📦</span> Laundry Orders</h3>
+                        <div class="toolbar">
+                            <select class="select-filter" id="orderStatusFilter" onchange="loadOrders()">
+                                <option value="All">🌐 All Statuses</option>
+                                <option value="Received">📥 Received</option>
+                                <option value="Washing">🧼 Washing</option>
+                                <option value="Drying">💨 Drying</option>
+                                <option value="Ironing">👔 Ironing</option>
+                                <option value="Ready for Pickup">📦 Ready for Pickup</option>
+                                <option value="Delivered">🚚 Delivered</option>
+                                <option value="Cancelled">❌ Cancelled</option>
+                            </select>
+                            <div class="search-box">
+                                <span>🔍</span>
+                                <input type="text" id="orderSearchInput" placeholder="Order # or customer..." oninput="debounce(loadOrders, 300)()">
+                            </div>
+                            <button class="btn-action btn-outline" onclick="loadOrders()"><span>🔄</span> Refresh</button>
+                            <button class="btn-action btn-primary" onclick="openCreateOrderModal()"><span>➕</span> Create Order</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="ordersTable">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Order Date</th>
+                                    <th>Expected Date</th>
+                                    <th>Total (₹)</th>
+                                    <th>Paid (₹)</th>
+                                    <th>Balance (₹)</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 5: STATUS TRACKING -->
+            <section id="module-statusTracking" class="module-page">
+                <div class="alert-banner" id="delayedBanner" style="display: none;">
+                    <span>⚠️</span>
+                    <span id="delayedBannerText">Notice: Delayed orders detected past expected delivery date!</span>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>🔄</span> Wash Cycle & Progress Pipeline</h3>
+                        <div class="toolbar">
+                            <select class="select-filter" id="trackingStatusFilter" onchange="loadTracking()">
+                                <option value="All">🌐 All Stages</option>
+                                <option value="Received">📥 Received</option>
+                                <option value="Washing">🧼 Washing</option>
+                                <option value="Drying">💨 Drying</option>
+                                <option value="Ironing">👔 Ironing</option>
+                                <option value="Ready for Pickup">📦 Ready for Pickup</option>
+                                <option value="Delivered">🚚 Delivered</option>
+                            </select>
+                            <button class="btn-action btn-outline" onclick="loadTracking()"><span>🔄</span> Refresh</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="trackingTable">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Order Date</th>
+                                    <th>Expected Date</th>
+                                    <th>Current Stage</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 6: BILLING & PAYMENTS -->
+            <section id="module-billing" class="module-page">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>💳</span> Billing & Payment Counter</h3>
+                    </div>
+                    <div style="display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <input type="text" class="form-input" id="billingSearchInput" placeholder="Enter Order # (e.g. 101) to bill" style="max-width: 300px;">
+                        <button class="btn-action btn-primary" onclick="lookupOrderBilling()"><span>🔍</span> Find Order</button>
+                    </div>
+
+                    <div id="billingResultArea" style="display: none;">
+                        <div style="background: var(--bg-body); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <h4 id="billOrderTitle" style="font-size: 18px; color: var(--blue-primary);">ORD-101</h4>
+                                    <p id="billCustomerInfo" style="font-size: 13px; color: var(--text-muted);"></p>
+                                </div>
+                                <div>
+                                    <span style="font-size: 13px; color: var(--text-muted);">Balance Due:</span>
+                                    <h3 id="billBalanceDue" style="font-size: 22px; color: var(--danger);">₹0.00</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Record Payment Form -->
+                        <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-width: 500px;">
+                            <h4 style="margin-bottom: 14px;"><span>💵</span> Collect Payment</h4>
+                            <div class="form-group">
+                                <label>Amount to Collect (₹) *</label>
+                                <input type="number" step="0.01" class="form-input" id="payAmount">
+                            </div>
+                            <div class="form-group">
+                                <label>Payment Method *</label>
+                                <select class="form-input" id="payMethod">
+                                    <option value="Cash">💵 Cash</option>
+                                    <option value="UPI">📱 UPI / QR Code</option>
+                                    <option value="Card">💳 Debit / Credit Card</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Transaction Reference (UPI ID / Receipt Ref)</label>
+                                <input type="text" class="form-input" id="payRef" placeholder="e.g. UPI-987654321">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-action btn-primary" onclick="submitPayment()"><span>💾</span> Record Payment</button>
+                                <button class="btn-action btn-outline" onclick="viewOrderReceipt(currentBillOrder.orderId)"><span>🧾</span> View Invoice</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 7: PICKUP & DELIVERY -->
+            <section id="module-deliveries" class="module-page">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>🚚</span> Dispatch & Transport Logistics</h3>
+                        <div class="toolbar">
+                            <button class="btn-action btn-outline" onclick="loadDeliveries()"><span>🔄</span> Refresh</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="deliveriesTable">
+                            <thead>
+                                <tr>
+                                    <th>Delivery #</th>
+                                    <th>Order Ref</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Type</th>
+                                    <th>Address</th>
+                                    <th>Scheduled Time</th>
+                                    <th>Assigned Staff</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 8: REPORTS & ANALYTICS -->
+            <section id="module-reports" class="module-page">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>📈</span> Payment Journal & Financial Reports</h3>
+                        <div class="toolbar">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label style="font-size: 13px; font-weight: 600;">From:</label>
+                                <input type="date" class="form-input" id="reportStartDate" style="padding: 6px 10px;">
+                                <label style="font-size: 13px; font-weight: 600;">To:</label>
+                                <input type="date" class="form-input" id="reportEndDate" style="padding: 6px 10px;">
+                            </div>
+                            <button class="btn-action btn-primary" onclick="loadReports()"><span>🔍</span> Filter</button>
+                            <button class="btn-action btn-outline" onclick="exportReportsCsv()"><span>📥</span> Export CSV</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="reportsTable">
+                            <thead>
+                                <tr>
+                                    <th>Payment #</th>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Amount (₹)</th>
+                                    <th>Method</th>
+                                    <th>Reference</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 9: DISPUTES & SUPPORT DESK -->
+            <section id="module-disputes" class="module-page">
+                <!-- Summary KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper icon-blue"><span>🚨</span></div>
+                        <div class="kpi-details">
+                            <span class="label">Total Support Tickets</span>
+                            <span class="value" id="dispTotalTickets">0</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper icon-yellow"><span>📝</span></div>
+                        <div class="kpi-details">
+                            <span class="label">Active Complaints</span>
+                            <span class="value" id="dispActiveComplaints">0</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper icon-purple"><span>🔍</span></div>
+                        <div class="kpi-details">
+                            <span class="label">Missing Garments</span>
+                            <span class="value" id="dispMissingGarments">0</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper icon-green"><span>💸</span></div>
+                        <div class="kpi-details">
+                            <span class="label">Pending Refunds</span>
+                            <span class="value" id="dispPendingRefunds">0 (₹0.00)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><span>🚨</span> Customer Complaints, Missing Garments & Refund Desk</h3>
+                        <div class="toolbar">
+                            <div class="search-box">
+                                <span>🔍</span>
+                                <input type="text" id="disputeSearchKeyword" placeholder="Search ticket #, phone, order..." onkeyup="filterDisputesTable()">
+                            </div>
+                            <select class="select-filter" id="disputeTypeFilter" onchange="loadDisputes()">
+                                <option value="All">All Types</option>
+                                <option value="Complaint">📝 Complaints</option>
+                                <option value="Missing_Item">🔍 Missing Garments</option>
+                                <option value="Refund_Request">💸 Refund Requests</option>
+                            </select>
+                            <select class="select-filter" id="disputeStatusFilter" onchange="loadDisputes()">
+                                <option value="All">All Statuses</option>
+                                <option value="Open">🟡 Open</option>
+                                <option value="In Review">🔵 In Review</option>
+                                <option value="Resolved">🟢 Resolved</option>
+                                <option value="Rejected">🔴 Rejected</option>
+                            </select>
+                            <button class="btn-action btn-outline" onclick="loadDisputes()"><span>🔄</span> Refresh</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="disputesTable">
+                            <thead>
+                                <tr>
+                                    <th>Ticket #</th>
+                                    <th>Type</th>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Category & Subject</th>
+                                    <th>Garment / Claim Specifics</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Created</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL: INSPECT & RESOLVE TICKET -->
+    <div class="modal-overlay" id="resolveTicketModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="resolveModalTitle"><span>🔍</span> Inspect & Resolve Dispute</h3>
+                <button class="modal-close" onclick="closeModal('resolveTicketModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="resolveTicketId">
+                <div style="background:var(--bg-body); padding:12px 14px; border-radius:10px; margin-bottom:14px; font-size:13px; border:1px solid var(--border);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span><b>Ticket:</b> <span id="resModalNum" style="color:var(--blue-primary); font-weight:bold;">-</span></span>
+                        <span><b>Type:</b> <span id="resModalType">-</span></span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span><b>Customer:</b> <span id="resModalCust">-</span></span>
+                        <span><b>Phone:</b> <span id="resModalPhone">-</span></span>
+                    </div>
+                    <div>
+                        <b>Order Reference:</b> <span id="resModalOrder">-</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>📌 Subject & Category</label>
+                    <input type="text" class="form-input" id="resModalSubject" readonly style="background:var(--bg-body);">
+                </div>
+
+                <div class="form-group" id="resModalItemDetailsGroup" style="display:none;">
+                    <label>👕 Missing Garment / Item Details</label>
+                    <input type="text" class="form-input" id="resModalItemDetails" readonly style="background:var(--bg-body);">
+                </div>
+
+                <div class="form-group" id="resModalRefundGroup" style="display:none;">
+                    <label>💸 Refund Amount Claimed & Payout Destination</label>
+                    <input type="text" class="form-input" id="resModalRefundInfo" readonly style="background:var(--bg-body); color:var(--blue-primary); font-weight:bold;">
+                </div>
+
+                <div class="form-group">
+                    <label>📝 Customer Grievance Description</label>
+                    <textarea class="form-input" id="resModalDesc" rows="3" readonly style="background:var(--bg-body);"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>⚡ Ticket Status *</label>
+                    <select class="form-input" id="resModalStatus">
+                        <option value="Open">🟡 Open (Under Queue)</option>
+                        <option value="In Review">🔵 In Review (Under Investigation / CCTV Audit)</option>
+                        <option value="Resolved">🟢 Resolved (Grievance Solved / Refund Credited)</option>
+                        <option value="Rejected">🔴 Rejected (Dispute Ineligible / Invalid)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>🛡️ Shop Response & Official Resolution Remarks *</label>
+                    <textarea class="form-input" id="resModalNotes" rows="3" placeholder="Enter findings, CCTV outcome, or UPI transaction payout reference ID (e.g. Approved ₹450 refund via UPI ref #UPI998811)..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-outline" onclick="closeModal('resolveTicketModal')"><span>✖️</span> Cancel</button>
+                <button class="btn-action btn-primary" onclick="saveTicketResolution()"><span>💾</span> Save Resolution & Update Ticket</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT CUSTOMER -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="custModalTitle"><span>➕</span> Add Customer</h3>
+                <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="custModalId">
+                <div class="form-group">
+                    <label>👤 Full Name *</label>
+                    <input type="text" class="form-input" id="custModalName" required>
+                </div>
+                <div class="form-group">
+                    <label>📞 Phone Number * (10-15 digits)</label>
+                    <input type="tel" class="form-input" id="custModalPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>✉️ Email Address</label>
+                    <input type="email" class="form-input" id="custModalEmail">
+                </div>
+                <div class="form-group">
+                    <label>📍 Address</label>
+                    <textarea class="form-input" id="custModalAddress" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-outline" onclick="closeModal('customerModal')"><span>✖️</span> Cancel</button>
+                <button class="btn-action btn-primary" onclick="saveCustomer()"><span>💾</span> Save Customer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT SERVICE -->
+    <div class="modal-overlay" id="serviceModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="srvModalTitle"><span>🏷️</span> Add Service</h3>
+                <button class="modal-close" onclick="closeModal('serviceModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="srvModalId">
+                <div class="form-group">
+                    <label>🏷️ Service Name *</label>
+                    <input type="text" class="form-input" id="srvModalName" required>
+                </div>
+                <div class="form-group">
+                    <label>📝 Description</label>
+                    <textarea class="form-input" id="srvModalDesc" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>⚖️ Pricing Unit *</label>
+                    <select class="form-input" id="srvModalUnit">
+                        <option value="Per Kg">Per Kilogram (Per Kg)</option>
+                        <option value="Per Item">Per Item</option>
+                        <option value="Fixed Fee">Fixed Fee</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>💰 Price (₹) *</label>
+                    <input type="number" step="0.01" class="form-input" id="srvModalPrice" required>
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="srvModalActive" checked>
+                    <label for="srvModalActive" style="margin-bottom: 0;">✅ Service is Active & Visible to Customers</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-outline" onclick="closeModal('serviceModal')"><span>✖️</span> Cancel</button>
+                <button class="btn-action btn-primary" onclick="saveService()"><span>💾</span> Save Service</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CREATE ORDER -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal-card" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3><span>➕</span> Register Laundry Order</h3>
+                <button class="modal-close" onclick="closeModal('orderModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>👤 Select Existing Customer *</label>
+                    <select class="form-input" id="newOrderCustSelect" required></select>
+                </div>
+
+                <div style="margin: 16px 0 10px 0; border-top: 1px solid var(--border); padding-top: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="font-weight: 700;">🧺 Laundry Services & Items</label>
+                        <button type="button" class="btn-action btn-outline" onclick="addOrderLineItem()" style="padding: 4px 10px; font-size: 12px;"><span>➕</span> Add Item</button>
+                    </div>
+                    <div id="newOrderItemsContainer"></div>
+                </div>
+
+                <div style="background: var(--bg-body); padding: 12px; border-radius: 10px; margin-bottom: 14px; text-align: right;">
+                    <span style="font-size: 14px; font-weight: bold;">Subtotal: <span id="newOrderSubtotal" style="color: var(--blue-primary);">₹0.00</span></span>
+                </div>
+
+                <div class="form-group">
+                    <label>🎟️ Optional Discount (₹)</label>
+                    <input type="number" step="0.01" class="form-input" id="newOrderDiscount" value="0.00" oninput="calcNewOrderTotal()">
+                </div>
+                <div class="form-group">
+                    <label>📅 Expected Ready / Delivery Date *</label>
+                    <input type="date" class="form-input" id="newOrderDate" required>
+                </div>
+                <div class="form-group">
+                    <label>📝 Special Garment Instructions</label>
+                    <input type="text" class="form-input" id="newOrderNotes" placeholder="e.g. Delicate silk, starch collar">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-outline" onclick="closeModal('orderModal')"><span>✖️</span> Cancel</button>
+                <button class="btn-action btn-primary" onclick="submitCreateOrder()"><span>🚀</span> Save & Create Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ORDER DETAILS & RECEIPT -->
+    <div class="modal-overlay" id="receiptModal">
+        <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><span>🧾</span> Order Invoice & Receipt</h3>
+                <button class="modal-close" onclick="closeModal('receiptModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="receiptContent" style="background: white; color: black; padding: 24px; border-radius: 8px;">
+                <!-- Printable Receipt rendered here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-outline" onclick="closeModal('receiptModal')"><span>✖️</span> Close</button>
+                <button class="btn-action btn-primary" onclick="window.print()"><span>🖨️</span> Print Invoice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: UPDATE STATUS -->
+    <div class="modal-overlay" id="statusModal">
+        <div class="modal-card" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3><span>🔄</span> Advance Order Stage</h3>
+                <button class="modal-close" onclick="closeModal('statusModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="statusOrderId">
+                <div class="form-group">
+                    <label>Order Reference</label>
+                    <input type="text" class="form-input" id="statusOrderTitle" readonly>
+                </div>
+                <div class="form-group">
+                    <label>New Progress Stage *</label>
+                    <select class="form-input" id="statusNextSelect">
+                        <option value="Received">📥 Received</option>
+                        <option value="Washing">🧼 Washing</option>
+                        <option value="Drying">💨 Drying</option>
+                        <option value="Ironing">👔 Ironing</option>
+                        <option value="Ready for Pickup">📦 Ready for Pickup</option>
+                        <option value="Delivered">🚚 Delivered</option>
+                        <option value="Cancelled">❌ Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Remarks / Staff Notes</label>
+                    <input type="text" class="form-input" id="statusRemarks" placeholder="e.g. Wash cycle completed by John">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-outline" onclick="closeModal('statusModal')"><span>✖️</span> Cancel</button>
+                <button class="btn-action btn-primary" onclick="saveStatusUpdate()"><span>💾</span> Update Stage</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let allServices = [];
+        let allCustomers = [];
+        let currentBillOrder = null;
+        let currentUser = { userId: 1, username: "admin", fullName: "System Administrator", role: "ADMIN" };
+
+        // 1. Init
+        document.addEventListener("DOMContentLoaded", () => {
+            initTheme();
+            loadDashboard();
+            loadDisputeStats();
+            loadServicesCatalog();
+            loadCustomersList();
+
+            // Set default dates
+            const now = new Date();
+            const twoDays = new Date();
+            twoDays.setDate(twoDays.getDate() + 2);
+            document.getElementById("newOrderDate").value = twoDays.toISOString().split("T")[0];
+
+            document.getElementById("reportEndDate").value = now.toISOString().split("T")[0];
+            const monthAgo = new Date();
+            monthAgo.setDate(monthAgo.getDate() - 30);
+            document.getElementById("reportStartDate").value = monthAgo.toISOString().split("T")[0];
+        });
+
+        // 2. Navigation Module Switcher
+        function showModule(moduleId, btn) {
+            document.querySelectorAll(".module-page").forEach(p => p.classList.remove("active"));
+            document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+
+            const target = document.getElementById("module-" + moduleId);
+            if (target) target.classList.add("active");
+            if (btn) btn.classList.add("active");
+
+            // Update Header Title
+            const titles = {
+                dashboard: { title: "📊 Dashboard Overview", sub: "Real-time laundry operations, KPIs, and financials" },
+                customers: { title: "👥 Customer Management", sub: "View, register, and update customer profiles" },
+                services: { title: "🏷️ Laundry Services & Pricing", sub: "Manage active service offerings and rates in Indian Rupees (₹)" },
+                orders: { title: "📦 Order Management", sub: "Register and inspect customer laundry orders" },
+                statusTracking: { title: "🔄 Laundry Status Tracking Pipeline", sub: "Monitor wash stages and address overdue garments" },
+                billing: { title: "💳 Billing & Payments", sub: "Collect payments, track balances, and issue invoices" },
+                deliveries: { title: "🚚 Pickup & Delivery Transport", sub: "Track vehicle schedules and dispatch completed laundry" },
+                reports: { title: "📈 Reports & Analytics", sub: "Financial journal and transaction logs" },
+                disputes: { title: "🚨 Customer Disputes & Support Desk", sub: "Inspect complaints, locate missing garments, and process refund claims" }
+            };
+
+            if (titles[moduleId]) {
+                document.getElementById("pageTitle").innerText = titles[moduleId].title;
+                document.getElementById("pageSubtitle").innerText = titles[moduleId].sub;
+            }
+
+            // Trigger fetch for selected module
+            if (moduleId === "dashboard") loadDashboard();
+            if (moduleId === "customers") loadCustomers();
+            if (moduleId === "services") loadServices();
+            if (moduleId === "orders") loadOrders();
+            if (moduleId === "statusTracking") loadTracking();
+            if (moduleId === "deliveries") loadDeliveries();
+            if (moduleId === "reports") loadReports();
+            if (moduleId === "disputes") loadDisputes();
+        }
+
+        // 3. Theme Toggle
+        function initTheme() {
+            const saved = localStorage.getItem("bluewave_admin_theme") || "light";
+            setTheme(saved);
+        }
+
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute("data-theme") || "light";
+            setTheme(cur === "light" ? "dark" : "light");
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("bluewave_admin_theme", theme);
+            document.getElementById("themeIcon").innerText = theme === "dark" ? "☀️" : "🌙";
+            document.getElementById("themeText").innerText = theme === "dark" ? "Light Mode" : "Dark Mode";
+        }
+
+        // Helper: Service Icon Matcher
+        function getServiceIcon(name) {
+            const n = (name || "").toLowerCase();
+            if (n.includes("washing")) return "🧼";
+            if (n.includes("ironing")) return "👔";
+            if (n.includes("dry cleaning") || n.includes("blazer") || n.includes("coat")) return "🧥";
+            if (n.includes("drying") || n.includes("dryer")) return "💨";
+            if (n.includes("fold") || n.includes("wash, dry")) return "🧺";
+            if (n.includes("bedsheet") || n.includes("blanket") || n.includes("curtain")) return "🛏️";
+            if (n.includes("steam") || n.includes("pressing")) return "♨️";
+            if (n.includes("pickup") || n.includes("delivery")) return "🚚";
+            return "✨";
+        }
+
+        function getStatusBadge(status) {
+            const s = (status || "").toLowerCase();
+            if (s === "received") return `<span class="badge badge-blue">📥 Received</span>`;
+            if (s === "washing") return `<span class="badge badge-amber">🧼 Washing</span>`;
+            if (s === "drying") return `<span class="badge badge-purple">💨 Drying</span>`;
+            if (s === "ironing") return `<span class="badge badge-amber">👔 Ironing</span>`;
+            if (s === "ready for pickup") return `<span class="badge badge-active">📦 Ready for Pickup</span>`;
+            if (s === "delivered") return `<span class="badge badge-active">🚚 Delivered</span>`;
+            if (s === "cancelled") return `<span class="badge badge-red">❌ Cancelled</span>`;
+            return `<span class="badge badge-inactive">${status}</span>`;
+        }
+
+        // 4. API Calls & Renderers
+
+        // DASHBOARD
+        async function loadDashboard() {
+            try {
+                const res = await fetch("/api/admin/stats");
+                const stats = await res.json();
+
+                document.getElementById("kpiTotalOrders").innerText = stats.totalOrders || 0;
+                document.getElementById("kpiPendingOrders").innerText = stats.pendingOrders || 0;
+                document.getElementById("kpiCompletedOrders").innerText = stats.completedOrders || 0;
+                document.getElementById("kpiTotalCustomers").innerText = stats.totalCustomers || 0;
+                document.getElementById("kpiActiveServices").innerText = stats.activeServices || 8;
+                document.getElementById("kpiTodayRevenue").innerText = "₹" + parseFloat(stats.todayRevenue || 0).toFixed(2);
+                document.getElementById("kpiTotalRevenue").innerText = "₹" + parseFloat(stats.totalRevenue || 0).toFixed(2);
+                document.getElementById("kpiOutstanding").innerText = "₹" + parseFloat(stats.outstandingPayments || 0).toFixed(2);
+
+                // Service summary cards
+                document.getElementById("srvTotal").innerText = stats.totalServices || 8;
+                document.getElementById("srvActive").innerText = stats.activeServices || 8;
+                document.getElementById("srvInactive").innerText = stats.inactiveServices || 0;
+                document.getElementById("srvAvgPrice").innerText = "₹" + parseFloat(stats.avgServicePrice || 0).toFixed(2);
+
+                // Load recent 5 orders into table
+                const oRes = await fetch("/api/orders?status=All");
+                const orders = await oRes.json();
+                const tbody = document.querySelector("#recentOrdersTable tbody");
+                if (orders.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No orders registered yet.</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = orders.slice(0, 6).map(o => `
+                    <tr>
+                        <td><b>ORD-${o.orderId}</b></td>
+                        <td>${escapeHtml(o.customerName)}</td>
+                        <td>${escapeHtml(o.customerPhone)}</td>
+                        <td>${escapeHtml(o.orderDate)}</td>
+                        <td>${escapeHtml(o.expectedDeliveryDate)}</td>
+                        <td><b>₹${parseFloat(o.totalAmount).toFixed(2)}</b></td>
+                        <td>${getStatusBadge(o.status)}</td>
+                        <td>
+                            <button class="btn-table" onclick="viewOrderReceipt(${o.orderId})"><span>👁️</span> View</button>
+                        </td>
+                    </tr>
+                `).join("");
+            } catch (err) {
+                console.error("Dashboard error:", err);
+            }
+        }
+
+        // CUSTOMERS
+        async function loadCustomers() {
+            const kw = document.getElementById("custSearchInput").value.trim();
+            const res = await fetch("/api/customers?keyword=" + encodeURIComponent(kw));
+            const list = await res.json();
+            allCustomers = list;
+
+            const tbody = document.querySelector("#customersTable tbody");
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No customers found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(c => `
+                <tr>
+                    <td>#${c.customerId}</td>
+                    <td><b>${escapeHtml(c.fullName)}</b></td>
+                    <td>${escapeHtml(c.phone)}</td>
+                    <td>${escapeHtml(c.email || "-")}</td>
+                    <td>${escapeHtml(c.address || "-")}</td>
+                    <td>${escapeHtml(c.dateRegistered ? c.dateRegistered.substring(0, 10) : "-")}</td>
+                    <td>
+                        <button class="btn-table" onclick="openEditCustomerModal(${c.customerId})"><span>✏️</span> Edit</button>
+                        <button class="btn-table danger" onclick="deleteCustomer(${c.customerId})"><span>🗑️</span> Delete</button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        async function loadCustomersList() {
+            const res = await fetch("/api/customers");
+            allCustomers = await res.json();
+            const select = document.getElementById("newOrderCustSelect");
+            select.innerHTML = allCustomers.map(c => `
+                <option value="${c.customerId}">${escapeHtml(c.fullName)} (${escapeHtml(c.phone)})</option>
+            `).join("");
+        }
+
+        function openAddCustomerModal() {
+            document.getElementById("custModalTitle").innerHTML = "<span>➕</span> Add New Customer";
+            document.getElementById("custModalId").value = "";
+            document.getElementById("custModalName").value = "";
+            document.getElementById("custModalPhone").value = "";
+            document.getElementById("custModalEmail").value = "";
+            document.getElementById("custModalAddress").value = "";
+            openModal("customerModal");
+        }
+
+        function openEditCustomerModal(id) {
+            const c = allCustomers.find(item => item.customerId === id);
+            if (!c) return;
+            document.getElementById("custModalTitle").innerHTML = "<span>✏️</span> Edit Customer Details";
+            document.getElementById("custModalId").value = c.customerId;
+            document.getElementById("custModalName").value = c.fullName;
+            document.getElementById("custModalPhone").value = c.phone;
+            document.getElementById("custModalEmail").value = c.email || "";
+            document.getElementById("custModalAddress").value = c.address || "";
+            openModal("customerModal");
+        }
+
+        async function saveCustomer() {
+            const id = document.getElementById("custModalId").value;
+            const name = document.getElementById("custModalName").value.trim();
+            const phone = document.getElementById("custModalPhone").value.trim();
+            const email = document.getElementById("custModalEmail").value.trim();
+            const address = document.getElementById("custModalAddress").value.trim();
+
+            if (!name || !phone) {
+                alert("Customer Full Name and Phone Number are required.");
+                return;
+            }
+
+            const method = id ? "PUT" : "POST";
+            const payload = { customerId: id ? parseInt(id) : undefined, fullName: name, phone: phone, email: email, address: address };
+
+            try {
+                const res = await fetch("/api/customers", {
+                    method: method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    closeModal("customerModal");
+                    loadCustomers();
+                    loadCustomersList();
+                }
+            } catch (err) {
+                alert("Network error saving customer");
+            }
+        }
+
+        async function deleteCustomer(id) {
+            if (!confirm(`Are you sure you want to delete customer #${id}?`)) return;
+            try {
+                const res = await fetch("/api/customers?id=" + id, { method: "DELETE" });
+                const data = await res.json();
+                if (data.error) alert("Error: " + data.error);
+                else loadCustomers();
+            } catch (err) {
+                alert("Network error deleting customer");
+            }
+        }
+
+        // SERVICES
+        async function loadServices() {
+            const kw = document.getElementById("srvSearchInput").value.trim();
+            const res = await fetch("/api/services?all=true&keyword=" + encodeURIComponent(kw));
+            const list = await res.json();
+            allServices = list;
+
+            const tbody = document.querySelector("#servicesTable tbody");
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No services found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(s => `
+                <tr>
+                    <td>#${s.serviceId}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:20px;">${getServiceIcon(s.serviceName)}</span>
+                            <b>${escapeHtml(s.serviceName)}</b>
+                        </div>
+                    </td>
+                    <td>${escapeHtml(s.description || "-")}</td>
+                    <td>${escapeHtml(s.pricingUnit)}</td>
+                    <td><b>₹${parseFloat(s.price).toFixed(2)}</b></td>
+                    <td>
+                        ${s.active 
+                            ? `<span class="badge badge-active">● Active</span>` 
+                            : `<span class="badge badge-inactive">○ Inactive</span>`}
+                    </td>
+                    <td>
+                        <button class="btn-table" onclick="openEditServiceModal(${s.serviceId})"><span>✏️</span> Edit</button>
+                        <button class="btn-table" onclick="toggleServiceStatus(${s.serviceId}, ${!s.active})">
+                            <span>⚡</span> ${s.active ? "Deactivate" : "Activate"}
+                        </button>
+                        <button class="btn-table danger" onclick="deleteService(${s.serviceId})"><span>🗑️</span> Delete</button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        async function loadServicesCatalog() {
+            const res = await fetch("/api/services?all=false");
+            allServices = await res.json();
+        }
+
+        function openAddServiceModal() {
+            document.getElementById("srvModalTitle").innerHTML = "<span>🏷️</span> Add Laundry Service";
+            document.getElementById("srvModalId").value = "";
+            document.getElementById("srvModalName").value = "";
+            document.getElementById("srvModalDesc").value = "";
+            document.getElementById("srvModalUnit").value = "Per Kg";
+            document.getElementById("srvModalPrice").value = "40.00";
+            document.getElementById("srvModalActive").checked = true;
+            openModal("serviceModal");
+        }
+
+        function openEditServiceModal(id) {
+            const s = allServices.find(item => item.serviceId === id);
+            if (!s) return;
+            document.getElementById("srvModalTitle").innerHTML = "<span>✏️</span> Edit Laundry Service";
+            document.getElementById("srvModalId").value = s.serviceId;
+            document.getElementById("srvModalName").value = s.serviceName;
+            document.getElementById("srvModalDesc").value = s.description || "";
+            document.getElementById("srvModalUnit").value = s.pricingUnit;
+            document.getElementById("srvModalPrice").value = parseFloat(s.price).toFixed(2);
+            document.getElementById("srvModalActive").checked = s.active;
+            openModal("serviceModal");
+        }
+
+        async function saveService() {
+            const id = document.getElementById("srvModalId").value;
+            const name = document.getElementById("srvModalName").value.trim();
+            const desc = document.getElementById("srvModalDesc").value.trim();
+            const unit = document.getElementById("srvModalUnit").value;
+            const price = document.getElementById("srvModalPrice").value.trim();
+            const active = document.getElementById("srvModalActive").checked;
+
+            if (!name || !price || parseFloat(price) <= 0) {
+                alert("Please provide valid service name and positive price.");
+                return;
+            }
+
+            const method = id ? "PUT" : "POST";
+            const payload = { serviceId: id ? parseInt(id) : undefined, serviceName: name, description: desc, pricingUnit: unit, price: price, active: active };
+
+            try {
+                const res = await fetch("/api/services", {
+                    method: method,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.error) alert("Error: " + data.error);
+                else {
+                    closeModal("serviceModal");
+                    loadServices();
+                    loadServicesCatalog();
+                    loadDashboard();
+                }
+            } catch (err) {
+                alert("Network error saving service");
+            }
+        }
+
+        async function toggleServiceStatus(id, newStatus) {
+            try {
+                const res = await fetch(`/api/services?id=${id}&active=${newStatus}`, { method: "PATCH" });
+                loadServices();
+                loadServicesCatalog();
+                loadDashboard();
+            } catch (err) {
+                alert("Error toggling status");
+            }
+        }
+
+        async function deleteService(id) {
+            if (!confirm(`Delete service #${id}? Past orders referencing this service will retain historical records.`)) return;
+            try {
+                const res = await fetch("/api/services?id=" + id, { method: "DELETE" });
+                const data = await res.json();
+                if (data.error) alert("Notice: " + data.error);
+                else {
+                    loadServices();
+                    loadServicesCatalog();
+                    loadDashboard();
+                }
+            } catch (err) {
+                alert("Network error deleting service");
+            }
+        }
+
+        // ORDERS
+        async function loadOrders() {
+            const status = document.getElementById("orderStatusFilter").value;
+            const kw = document.getElementById("orderSearchInput").value.trim();
+            const res = await fetch(`/api/orders?status=${encodeURIComponent(status)}&keyword=${encodeURIComponent(kw)}`);
+            const list = await res.json();
+
+            const tbody = document.querySelector("#ordersTable tbody");
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--text-muted);">No orders found matching criteria.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(o => `
+                <tr>
+                    <td><b>ORD-${o.orderId}</b></td>
+                    <td>${escapeHtml(o.customerName)}</td>
+                    <td>${escapeHtml(o.customerPhone)}</td>
+                    <td>${escapeHtml(o.orderDate)}</td>
+                    <td>${escapeHtml(o.expectedDeliveryDate)}</td>
+                    <td><b>₹${parseFloat(o.totalAmount).toFixed(2)}</b></td>
+                    <td style="color:var(--success);">₹${parseFloat(o.paidAmount || 0).toFixed(2)}</td>
+                    <td style="color:var(--danger);"><b>₹${parseFloat(o.balanceDue || 0).toFixed(2)}</b></td>
+                    <td>${getStatusBadge(o.status)}</td>
+                    <td>
+                        <button class="btn-table" onclick="viewOrderReceipt(${o.orderId})"><span>🧾</span> Receipt</button>
+                        <button class="btn-table" onclick="openStatusModal(${o.orderId}, '${escapeHtml(o.status)}')"><span>🔄</span> Status</button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        function openCreateOrderModal() {
+            loadCustomersList();
+            const container = document.getElementById("newOrderItemsContainer");
+            container.innerHTML = "";
+            addOrderLineItem();
+            calcNewOrderTotal();
+            openModal("orderModal");
+        }
+
+        function addOrderLineItem() {
+            const container = document.getElementById("newOrderItemsContainer");
+            const div = document.createElement("div");
+            div.className = "order-line-item";
+            div.style = "display: flex; gap: 8px; margin-bottom: 8px; align-items: center;";
+
+            const options = allServices.map(s => 
+                `<option value="${s.serviceId}" data-price="${s.price}">${getServiceIcon(s.serviceName)} ${escapeHtml(s.serviceName)} (₹${s.price}/${s.pricingUnit})</option>`
+            ).join("");
+
+            div.innerHTML = `
+                <select class="form-input srv-select" onchange="calcNewOrderTotal()" style="flex: 2;">${options}</select>
+                <input type="number" step="1" min="1" value="1" class="form-input qty-input" oninput="calcNewOrderTotal()" style="width: 70px;">
+                <span class="line-subtotal" style="width: 80px; font-weight: bold; text-align: right;">₹0.00</span>
+                <button type="button" class="btn-table danger" onclick="this.parentElement.remove(); calcNewOrderTotal();">&times;</button>
+            `;
+            container.appendChild(div);
+            calcNewOrderTotal();
+        }
+
+        function calcNewOrderTotal() {
+            let subtotal = 0;
+            document.querySelectorAll(".order-line-item").forEach(row => {
+                const sel = row.querySelector(".srv-select");
+                const qty = parseFloat(row.querySelector(".qty-input").value) || 1;
+                const price = parseFloat(sel.selectedOptions[0]?.getAttribute("data-price") || 0);
+                const lineTotal = qty * price;
+                subtotal += lineTotal;
+                row.querySelector(".line-subtotal").innerText = "₹" + lineTotal.toFixed(2);
+            });
+
+            document.getElementById("newOrderSubtotal").innerText = "₹" + subtotal.toFixed(2);
+        }
+
+        async function submitCreateOrder() {
+            const custId = document.getElementById("newOrderCustSelect").value;
+            const expDate = document.getElementById("newOrderDate").value;
+            const notes = document.getElementById("newOrderNotes").value.trim();
+            const discount = parseFloat(document.getElementById("newOrderDiscount").value) || 0;
+
+            const items = [];
+            document.querySelectorAll(".order-line-item").forEach(row => {
+                const srvId = parseInt(row.querySelector(".srv-select").value);
+                const qty = parseFloat(row.querySelector(".qty-input").value) || 1;
+                if (srvId && qty > 0) items.push({ serviceId: srvId, quantity: qty });
+            });
+
+            if (items.length === 0) {
+                alert("Please add at least one laundry service item.");
+                return;
+            }
+
+            const payload = {
+                customerId: parseInt(custId),
+                expectedDeliveryDate: expDate,
+                specialInstructions: notes,
+                discount: discount,
+                items: items
+            };
+
+            try {
+                const res = await fetch("/api/orders", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.error) alert("Error: " + data.error);
+                else {
+                    closeModal("orderModal");
+                    loadOrders();
+                    loadDashboard();
+                    viewOrderReceipt(data.orderId);
+                }
+            } catch (err) {
+                alert("Network error placing order");
+            }
+        }
+
+        // STATUS TRACKING
+        async function loadTracking() {
+            const status = document.getElementById("trackingStatusFilter").value;
+            const res = await fetch(`/api/orders?status=${encodeURIComponent(status)}`);
+            const orders = await res.json();
+
+            // Detect overdue orders
+            const today = new Date().toISOString().split("T")[0];
+            const delayed = orders.filter(o => o.expectedDeliveryDate < today && o.status !== "Delivered" && o.status !== "Cancelled");
+            const banner = document.getElementById("delayedBanner");
+            if (delayed.length > 0) {
+                banner.style.display = "flex";
+                document.getElementById("delayedBannerText").innerText = `⚠️ Notice: ${delayed.length} order(s) are overdue past their expected delivery date! Prioritize wash processing.`;
+            } else {
+                banner.style.display = "none";
+            }
+
+            const tbody = document.querySelector("#trackingTable tbody");
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--text-muted);">No orders in tracking pipeline.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(o => `
+                <tr>
+                    <td><b>ORD-${o.orderId}</b></td>
+                    <td>${escapeHtml(o.customerName)}</td>
+                    <td>${escapeHtml(o.customerPhone)}</td>
+                    <td>${escapeHtml(o.orderDate)}</td>
+                    <td style="${o.expectedDeliveryDate < today && o.status !== 'Delivered' ? 'color:var(--danger); font-weight:bold;' : ''}">
+                        ${escapeHtml(o.expectedDeliveryDate)}
+                    </td>
+                    <td>${getStatusBadge(o.status)}</td>
+                    <td>
+                        <button class="btn-action btn-primary" style="padding: 4px 10px; font-size: 12px;" onclick="openStatusModal(${o.orderId}, '${escapeHtml(o.status)}')">
+                            <span>🔄</span> Advance Stage
+                        </button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        function openStatusModal(orderId, currentStatus) {
+            document.getElementById("statusOrderId").value = orderId;
+            document.getElementById("statusOrderTitle").value = "ORD-" + orderId + " (Current: " + currentStatus + ")";
+            document.getElementById("statusRemarks").value = "";
+            openModal("statusModal");
+        }
+
+        async function saveStatusUpdate() {
+            const orderId = document.getElementById("statusOrderId").value;
+            const newStatus = document.getElementById("statusNextSelect").value;
+            const remarks = document.getElementById("statusRemarks").value.trim();
+
+            try {
+                const res = await fetch("/api/orders/status", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orderId: orderId, status: newStatus, remarks: remarks, userId: currentUser.userId })
+                });
+                const data = await res.json();
+                if (data.error) alert("Transition rule: " + data.error);
+                else {
+                    closeModal("statusModal");
+                    loadTracking();
+                    loadOrders();
+                    loadDashboard();
+                }
+            } catch (err) {
+                alert("Error updating status");
+            }
+        }
+
+        // BILLING
+        async function lookupOrderBilling() {
+            const input = document.getElementById("billingSearchInput").value.trim();
+            if (!input) return;
+            try {
+                const res = await fetch(`/api/orders/details?orderId=${encodeURIComponent(input)}`);
+                const order = await res.json();
+                if (order.error) {
+                    alert("Order not found");
+                    return;
+                }
+                currentBillOrder = order;
+                document.getElementById("billingResultArea").style.display = "block";
+                document.getElementById("billOrderTitle").innerText = "ORD-" + order.orderId + " — " + order.customerName;
+                document.getElementById("billCustomerInfo").innerText = "Phone: " + order.customerPhone + " | Date: " + order.orderDate;
+                document.getElementById("billBalanceDue").innerText = "₹" + parseFloat(order.balanceDue).toFixed(2);
+                document.getElementById("payAmount").value = parseFloat(order.balanceDue).toFixed(2);
+            } catch (err) {
+                alert("Error retrieving billing details");
+            }
+        }
+
+        async function submitPayment() {
+            if (!currentBillOrder) return;
+            const amount = parseFloat(document.getElementById("payAmount").value) || 0;
+            const method = document.getElementById("payMethod").value;
+            const ref = document.getElementById("payRef").value.trim();
+
+            if (amount <= 0) {
+                alert("Please enter a valid positive payment amount.");
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/billing/pay", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orderId: currentBillOrder.orderId, amount: amount, paymentMethod: method, transactionReference: ref })
+                });
+                const data = await res.json();
+                if (data.error) alert("Payment rule error: " + data.error);
+                else {
+                    alert("Payment recorded successfully!");
+                    lookupOrderBilling();
+                    loadDashboard();
+                }
+            } catch (err) {
+                alert("Error processing payment");
+            }
+        }
+
+        // RECEIPT MODAL
+        async function viewOrderReceipt(orderId) {
+            try {
+                const res = await fetch(`/api/orders/details?orderId=${orderId}`);
+                const o = await res.json();
+                if (o.error) return;
+
+                const content = document.getElementById("receiptContent");
+                content.innerHTML = `
+                    <div style="text-align: center; border-bottom: 2px dashed #94A3B8; padding-bottom: 14px; margin-bottom: 14px;">
+                        <h2 style="color: #1B2A4A; font-size: 20px;">🧺 BLUE WAVE LAUNDRY SYSTEMS</h2>
+                        <p style="font-size: 12px; color: #64748B;">Express Fabric Care & Professional Dry Cleaning</p>
+                        <h3 style="margin-top: 10px; font-size: 16px; color: #2563EB;">ORDER INVOICE: ORD-${o.orderId}</h3>
+                    </div>
+                    <div style="font-size: 13px; line-height: 1.6; margin-bottom: 14px;">
+                        <div><b>Customer:</b> ${escapeHtml(o.customerName)} (${escapeHtml(o.customerPhone)})</div>
+                        <div><b>Address:</b> ${escapeHtml(o.customerAddress || "Store Pickup")}</div>
+                        <div><b>Booking Date:</b> ${escapeHtml(o.orderDate)}</div>
+                        <div><b>Delivery Date:</b> ${escapeHtml(o.expectedDeliveryDate)}</div>
+                        <div><b>Current Status:</b> <b>${escapeHtml(o.status)}</b></div>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #CBD5E1;">
+                                <th style="padding: 6px 0; text-align: left;">Service</th>
+                                <th style="padding: 6px 0; text-align: center;">Qty</th>
+                                <th style="padding: 6px 0; text-align: right;">Rate (₹)</th>
+                                <th style="padding: 6px 0; text-align: right;">Subtotal (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(o.items || []).map(it => `
+                                <tr style="border-bottom: 1px dotted #E2E8F0;">
+                                    <td style="padding: 6px 0;">${escapeHtml(it.serviceName)}</td>
+                                    <td style="padding: 6px 0; text-align: center;">${it.quantity}</td>
+                                    <td style="padding: 6px 0; text-align: right;">₹${parseFloat(it.unitPrice).toFixed(2)}</td>
+                                    <td style="padding: 6px 0; text-align: right;">₹${parseFloat(it.subtotal).toFixed(2)}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                    <div style="border-top: 1px solid #CBD5E1; padding-top: 10px; font-size: 14px; line-height: 1.8; text-align: right;">
+                        <div>Subtotal: <b>₹${parseFloat(o.subtotal).toFixed(2)}</b></div>
+                        <div>Discount: <b>-₹${parseFloat(o.discount || 0).toFixed(2)}</b></div>
+                        <div style="font-size: 16px; color: #2563EB;"><b>Total Amount: ₹${parseFloat(o.totalAmount).toFixed(2)}</b></div>
+                        <div style="color: #10B981;">Paid: ₹${parseFloat(o.paidAmount || 0).toFixed(2)}</div>
+                        <div style="font-size: 15px; color: #EF4444;"><b>Balance Due: ₹${parseFloat(o.balanceDue || 0).toFixed(2)}</b></div>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px; font-size: 11px; color: #94A3B8; border-top: 1px dashed #CBD5E1; padding-top: 10px;">
+                        Thank you for choosing Blue Wave Laundry! All amounts in Indian Rupees (₹).
+                    </div>
+                `;
+                openModal("receiptModal");
+            } catch (err) {
+                console.error("Receipt error:", err);
+            }
+        }
+
+        // DELIVERIES
+        async function loadDeliveries() {
+            const res = await fetch("/api/deliveries");
+            const list = await res.json();
+            const tbody = document.querySelector("#deliveriesTable tbody");
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--text-muted);">No deliveries scheduled.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(d => `
+                <tr>
+                    <td>#${d.deliveryId}</td>
+                    <td><b>ORD-${d.orderId}</b></td>
+                    <td>${escapeHtml(d.customerName)}</td>
+                    <td>${escapeHtml(d.customerPhone)}</td>
+                    <td>${escapeHtml(d.deliveryType)}</td>
+                    <td>${escapeHtml(d.address)}</td>
+                    <td>${escapeHtml(d.scheduledDateTime)}</td>
+                    <td>${escapeHtml(d.assignedStaffName || "Unassigned")}</td>
+                    <td><span class="badge badge-blue">${escapeHtml(d.status)}</span></td>
+                    <td>
+                        <button class="btn-table" onclick="updateDeliveryStatus(${d.deliveryId}, 'In Transit')"><span>🚗</span> In Transit</button>
+                        <button class="btn-table" onclick="updateDeliveryStatus(${d.deliveryId}, 'Delivered')"><span>✅</span> Done</button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        async function updateDeliveryStatus(id, newStatus) {
+            try {
+                await fetch("/api/deliveries", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ deliveryId: id, status: newStatus })
+                });
+                loadDeliveries();
+            } catch (err) {
+                alert("Error updating delivery");
+            }
+        }
+
+        // REPORTS
+        async function loadReports() {
+            const start = document.getElementById("reportStartDate").value;
+            const end = document.getElementById("reportEndDate").value;
+            const res = await fetch(`/api/reports?start=${start}&end=${end}`);
+            const list = await res.json();
+            const tbody = document.querySelector("#reportsTable tbody");
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--text-muted);">No payment records in selected period.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(r => `
+                <tr>
+                    <td>#${r.paymentId}</td>
+                    <td><b>ORD-${r.orderId}</b></td>
+                    <td>${escapeHtml(r.paymentDate)}</td>
+                    <td>${escapeHtml(r.customerName)}</td>
+                    <td>${escapeHtml(r.customerPhone)}</td>
+                    <td><b style="color:var(--success);">₹${parseFloat(r.amount).toFixed(2)}</b></td>
+                    <td><span class="badge badge-blue">${escapeHtml(r.paymentMethod)}</span></td>
+                    <td>${escapeHtml(r.transactionReference || "-")}</td>
+                    <td><span class="badge badge-active">${escapeHtml(r.status)}</span></td>
+                </tr>
+            `).join("");
+        }
+
+        function exportReportsCsv() {
+            const rows = document.querySelectorAll("#reportsTable tr");
+            let csv = [];
+            rows.forEach(r => {
+                const cols = r.querySelectorAll("th, td");
+                let row = [];
+                cols.forEach(c => row.push('"' + c.innerText.replace(/"/g, '""') + '"'));
+                csv.push(row.join(","));
+            });
+
+            const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `laundry_payment_journal_${new Date().toISOString().split("T")[0]}.csv`;
+            link.click();
+        }
+
+        // =============================================================
+        // 10. DISPUTES & SUPPORT DESK
+        // =============================================================
+        let allDisputes = [];
+
+        async function loadDisputeStats() {
+            try {
+                const res = await fetch("/api/admin/tickets/stats");
+                if (!res.ok) return;
+                const stats = await res.json();
+                document.getElementById("dispTotalTickets").innerText = stats.totalTickets || 0;
+                document.getElementById("dispActiveComplaints").innerText = stats.openComplaints || 0;
+                document.getElementById("dispMissingGarments").innerText = stats.missingItems || 0;
+                document.getElementById("dispPendingRefunds").innerText = (stats.pendingRefunds || 0) + " (₹" + parseFloat(stats.totalRefundAmount || 0).toFixed(2) + ")";
+
+                const badge = document.getElementById("sidebarDisputeCount");
+                const activeCount = stats.activeTickets || 0;
+                if (activeCount > 0) {
+                    badge.style.display = "inline-block";
+                    badge.innerText = activeCount;
+                } else {
+                    badge.style.display = "none";
+                }
+            } catch (ignored) {}
+        }
+
+        async function loadDisputes() {
+            loadDisputeStats();
+            const type = document.getElementById("disputeTypeFilter").value;
+            const status = document.getElementById("disputeStatusFilter").value;
+            const keyword = document.getElementById("disputeSearchKeyword").value.trim();
+
+            try {
+                const res = await fetch(`/api/tickets?type=${encodeURIComponent(type)}&status=${encodeURIComponent(status)}&keyword=${encodeURIComponent(keyword)}`);
+                if (!res.ok) return;
+                allDisputes = await res.json();
+                renderDisputesTable(allDisputes);
+            } catch (err) {
+                console.error("Error loading disputes:", err);
+            }
+        }
+
+        function filterDisputesTable() {
+            const kw = document.getElementById("disputeSearchKeyword").value.toLowerCase();
+            const filtered = allDisputes.filter(d => 
+                (d.ticketNumber && d.ticketNumber.toLowerCase().includes(kw)) ||
+                (d.customerName && d.customerName.toLowerCase().includes(kw)) ||
+                (d.customerPhone && d.customerPhone.includes(kw)) ||
+                (d.subject && d.subject.toLowerCase().includes(kw)) ||
+                (d.orderId && String(d.orderId).includes(kw))
+            );
+            renderDisputesTable(filtered);
+        }
+
+        function renderDisputesTable(list) {
+            const tbody = document.querySelector("#disputesTable tbody");
+            if (!list || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:var(--text-muted);">No support tickets or dispute claims found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(t => {
+                let badgeClass = "badge-warning";
+                if (t.status === "In Review") badgeClass = "badge-blue";
+                else if (t.status === "Resolved") badgeClass = "badge-active";
+                else if (t.status === "Rejected") badgeClass = "badge-danger";
+
+                let typeBadge = '<span class="badge badge-yellow">📝 Complaint</span>';
+                if (t.ticketType === "Missing_Item") typeBadge = '<span class="badge badge-purple">🔍 Missing</span>';
+                else if (t.ticketType === "Refund_Request") typeBadge = '<span class="badge badge-green">💸 Refund</span>';
+
+                let specifics = "-";
+                if (t.ticketType === "Missing_Item" && t.itemDetails) {
+                    specifics = escapeHtml(t.itemDetails);
+                } else if (t.ticketType === "Refund_Request") {
+                    specifics = `<b>₹${parseFloat(t.amountClaimed || 0).toFixed(2)}</b><br><span style="font-size:11px; color:var(--text-muted);">${escapeHtml(t.payoutDetails || "-")}</span>`;
+                }
+
+                return `
+                    <tr>
+                        <td><b>${escapeHtml(t.ticketNumber)}</b></td>
+                        <td>${typeBadge}</td>
+                        <td>${t.orderId ? `<b>ORD-${t.orderId}</b>` : '<span style="color:var(--text-muted);">-</span>'}</td>
+                        <td><b>${escapeHtml(t.customerName)}</b><br><span style="font-size:11px; color:var(--text-muted);">${escapeHtml(t.customerPhone)}</span></td>
+                        <td><b>${escapeHtml(t.subject)}</b><br><span style="font-size:11px; color:var(--text-muted);">${escapeHtml(t.category)}</span></td>
+                        <td>${specifics}</td>
+                        <td><span class="badge ${badgeClass}">${escapeHtml(t.status)}</span></td>
+                        <td><span class="badge ${t.priority === 'Urgent' ? 'badge-danger' : (t.priority === 'High' ? 'badge-warning' : 'badge-inactive')}">${escapeHtml(t.priority || 'Normal')}</span></td>
+                        <td style="font-size:12px; color:var(--text-muted);">${escapeHtml(t.createdAt || "")}</td>
+                        <td style="text-align: right;">
+                            <button class="btn-table btn-table-edit" onclick="openResolveTicketModal(${t.ticketId})">
+                                <span>🔍</span> Inspect
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        function openResolveTicketModal(ticketId) {
+            const ticket = allDisputes.find(t => t.ticketId === ticketId);
+            if (!ticket) return;
+
+            document.getElementById("resolveTicketId").value = ticket.ticketId;
+            document.getElementById("resModalNum").innerText = ticket.ticketNumber;
+            document.getElementById("resModalType").innerText = ticket.ticketType;
+            document.getElementById("resModalCust").innerText = ticket.customerName;
+            document.getElementById("resModalPhone").innerText = ticket.customerPhone;
+            document.getElementById("resModalOrder").innerText = ticket.orderId ? "ORD-" + ticket.orderId : "Not linked to specific order";
+            document.getElementById("resModalSubject").value = `[${ticket.category}] ${ticket.subject}`;
+            document.getElementById("resModalDesc").value = ticket.description;
+
+            // Missing Item specifics
+            const itemGroup = document.getElementById("resModalItemDetailsGroup");
+            if (ticket.ticketType === "Missing_Item" && ticket.itemDetails) {
+                itemGroup.style.display = "block";
+                document.getElementById("resModalItemDetails").value = ticket.itemDetails;
+            } else {
+                itemGroup.style.display = "none";
+            }
+
+            // Refund specifics
+            const refundGroup = document.getElementById("resModalRefundGroup");
+            if (ticket.ticketType === "Refund_Request") {
+                refundGroup.style.display = "block";
+                document.getElementById("resModalRefundInfo").value = `Claim Amount: ₹${parseFloat(ticket.amountClaimed || 0).toFixed(2)} | Destination: ${ticket.payoutDetails || "Not specified"}`;
+            } else {
+                refundGroup.style.display = "none";
+            }
+
+            document.getElementById("resModalStatus").value = ticket.status || "Open";
+            document.getElementById("resModalNotes").value = ticket.adminNotes || "";
+
+            openModal("resolveTicketModal");
+        }
+
+        async function saveTicketResolution() {
+            const ticketId = document.getElementById("resolveTicketId").value;
+            const status = document.getElementById("resModalStatus").value;
+            const notes = document.getElementById("resModalNotes").value.trim();
+
+            if (!status) {
+                alert("Please select a status for this ticket.");
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/admin/tickets/resolve", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ticketId: ticketId,
+                        status: status,
+                        adminNotes: notes
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    closeModal("resolveTicketModal");
+                    showToast("Dispute ticket updated successfully!");
+                    loadDisputes();
+                } else {
+                    alert("Failed updating ticket: " + (data.error || "Unknown error"));
+                }
+            } catch (err) {
+                alert("Error saving ticket resolution: " + err.message);
+            }
+        }
+
+        // Modal Helpers
+        function openModal(id) {
+            document.getElementById(id).classList.add("active");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove("active");
+        }
+
+        function logout() {
+            if (confirm("Sign out of Laundry Admin Control Center?")) {
+                window.location.href = "/";
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            const div = document.createElement("div");
+            div.innerText = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

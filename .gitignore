@@ -1,0 +1,36 @@
+# Compiled class files
+*.class
+
+# Maven build outputs
+target/
+
+# Gradle build cache & outputs
+.gradle/
+build/
+*/build/
+android-customer-app/.gradle/
+android-customer-app/build/
+android-customer-app/app/build/
+
+# Local machine Android SDK paths
+local.properties
+android-customer-app/local.properties
+
+# Runtime database storage files
+data/
+*.mv.db
+*.trace.db
+
+# IDE & Editor configuration
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+*.swp
+Thumbs.db
+.DS_Store
+
+# Preserve standalone release APK at repository root
+!BlueWave-Laundry-Customer.apk
